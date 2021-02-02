@@ -32,6 +32,7 @@
     "react-native-safe-area-context": "^3.1.8",
     "react-native-screens": "^2.11.0",
     "react-native-swiper": "^1.6.0",
+    "react-native-track-player": "^1.2.3",
     "react-native-vector-icons": "^7.1.0",
     "react-redux": "^7.2.1",
     "redux": "^4.0.5",
@@ -51,4 +52,6 @@
   "jest": {
     "preset": "react-native"
   }
+   
+
 }

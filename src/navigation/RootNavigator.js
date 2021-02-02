@@ -11,7 +11,7 @@ const Stack = createStackNavigator();
 
 function RootNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Home" headerMode="none">
+    <Stack.Navigator initialRouteName="Login" headerMode="none">
       <Stack.Screen name="SplashScreen" component={SplashScreen} />
       {/* <Stack.Screen name="Welcome" component={Welcome} />
       <Stack.Screen name="AppNavigator" component={AppNavigator} /> */}

@@ -16,6 +16,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import GlobalButton from '../../components/GlobalButton';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios';
 // import ErrorModal from '../../components/ErrorModal';
 
 const Login = ({
@@ -29,23 +30,55 @@ const Login = ({
 }) => {
   const [email, setEmail] = useState('');
   const [password, setpassword] = useState('');
+  const [emailErr, setemailErr] = useState(false);
+  const [passwordErr, setpasswordErr] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState(false);
   const loginHandler = () => {
     // alert('dssda');
-    // if (email == '' || email == ' ') {
-    //   setemailErr(true);
-    // } else {
-    //   setemailErr(false);
+    if (email == '' || email == ' ') {
+      setemailErr(true);
+    } else {
+      setemailErr(false);
+    }
+    if (password == '' || password == ' ') {
+      setpasswordErr(true);
+    } else {
+      setpasswordErr(false);
+    }
+    if (email !== '' && password !== '') {
+      // login(email, password);
+      // login(email.trim().toLowerCase(), password, navigation);
+      const body = JSON.stringify({
+        email: email,
+        password: password,
+      });
+      setLoading(true);
+      axios({
+        method: 'POST',
+        url: `https://moosikk.herokuapp.com/api/v1/auth/login`,
+        data: body,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(async (response) => {
+          setLoading(false);
+          // await AsyncStorage.setItem('token', response.data.token);
+          navigation.navigate('Home');
+          // alert('Post has been favorited');
+        })
+        .catch(function (response) {
+          //handle error
+          // alert('User already exists');
+          // console.log(response);
+          setLoading(false);
+          setErrors(true);
+        });
+    }
+    // if (email !== '' && password !== '') {
+    //   navigation.navigate('Home');
     // }
-    // if (password == '' || password == ' ') {
-    //   setpasswordErr(true);
-    // } else {
-    //   setpasswordErr(false);
-    // }
-    // if (emailErr == false && passwordErr == false) {
-    // login(email, password);
-    // login(email.trim().toLowerCase(), password, navigation);
-    // }
-    // navigation.navigate('RestaurantDetail');
     // alert('dasddsaasddasasddsa');
   };
 
@@ -80,7 +113,7 @@ const Login = ({
               onChangeText={(text) => setEmail(text)}
             />
           </View>
-          {/* {emailErr && <Text style={styles.errTxt}>Invalid email</Text>} */}
+          {emailErr && <Text style={styles.errTxt}>Please type email</Text>}
 
           <View style={styles.viewSearch}>
             <AntDesign name="lock" color="#bbb" size={20} />
@@ -93,26 +126,28 @@ const Login = ({
               onChangeText={(text) => setpassword(text)}
             />
           </View>
-          {/* {passwordErr && <Text style={styles.errTxt}>Invalid Password</Text>} */}
-          {/* {errors ? (
+          {passwordErr && (
+            <Text style={styles.errTxt}>Please type Password</Text>
+          )}
+          {errors ? (
             <Text style={styles.errTxt}>Invalid email or password</Text>
-          ) : null} */}
+          ) : null}
 
-          {/* {loading ? (
+          {loading ? (
             <ActivityIndicator
               size="large"
               color="#fff"
               // style={{marginVertical: loading ? 20 : 0}}
             />
-          ) : ( */}
-          <GlobalButton
-            // onPress={loginHandler}
-            navigationProps={loginHandler}
-            top={25}
-            btnWidth={'100%'}
-            buttonText="LOGIN"
-          />
-          {/* )} */}
+          ) : (
+            <GlobalButton
+              // onPress={loginHandler}
+              navigationProps={loginHandler}
+              top={25}
+              btnWidth={'100%'}
+              buttonText="LOGIN"
+            />
+          )}
           <Text style={styles.dontHave}>Don't have an account?</Text>
           <TouchableOpacity
             onPress={() => navigation.navigate('Signup')}

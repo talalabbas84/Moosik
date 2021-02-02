@@ -23,6 +23,8 @@ import GlobalButton from '../../components/GlobalButton';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios';
+import AsyncStorage from '@react-native-community/async-storage';
 // import ErrorModal from '../../components/ErrorModal';
 
 const Signup = ({
@@ -39,13 +41,14 @@ const Signup = ({
 
   const [visible, setvisible] = useState(false);
   const [phone, setphone] = useState('');
-  const [cca2, setcca2] = useState('AE');
-  const [countryCode, setcountryCode] = useState('353');
+  const [cca2, setcca2] = useState('PK');
+  const [countryCode, setcountryCode] = useState('923');
 
   const [nameErr, setnameErr] = useState(false);
   const [emailErr, setemailErr] = useState(false);
   const [passwordErr, setpasswordErr] = useState(false);
   const [phoneNumberErr, setphoneNumberErr] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -94,52 +97,73 @@ const Signup = ({
 
   // console.log(phoneNumber, 'phoneeeeeee');
   const signupHandler = async (e) => {
-    // if (
-    //   !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email) ||
-    //   email === '' ||
-    //   email === ' '
-    // ) {
-    //   setemailErr(true);
-    // } else {
-    //   setemailErr(false);
-    // }
-    // if (name === '' || name === ' ') {
-    //   setnameErr(true);
-    // } else {
-    //   setnameErr(false);
-    // }
-    // if (phoneNumber === '' || phoneNumber === ' ' || phoneNumber.length <= 1) {
-    //   setphoneNumberErr(true);
-    // } else {
-    //   setphoneNumberErr(false);
-    // }
-    // if (password === '' || password === ' ') {
-    //   setpasswordErr(true);
-    // } else {
-    //   setpasswordErr(false);
-    // }
-    // if (
-    //   /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email) &&
-    //   email !== '' &&
-    //   email !== ' ' &&
-    //   phoneNumber !== '' &&
-    //   phoneNumber !== ' ' &&
-    //   password !== '' &&
-    //   password !== ' ' &&
-    //   name !== ' ' &&
-    //   name !== '' &&
-    //   phoneNumber.length > 1
-    // ) {
-    //   register(
-    //     name,
-    //     email.trim().toLowerCase(),
-    //     phoneNumber,
-    //     password,
-    //     navigation,
-    //   );
-    // }
-    // }
-    // navigation.navigate('Subsription') ;
+    if (
+      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email) ||
+      email === '' ||
+      email === ' '
+    ) {
+      setemailErr(true);
+    } else {
+      setemailErr(false);
+    }
+    if (name === '' || name === ' ') {
+      setnameErr(true);
+    } else {
+      setnameErr(false);
+    }
+    if (phoneNumber === '' || phoneNumber === ' ' || phoneNumber.length <= 1) {
+      setphoneNumberErr(true);
+    } else {
+      setphoneNumberErr(false);
+    }
+    if (password === '' || password === ' ') {
+      setpasswordErr(true);
+    } else {
+      setpasswordErr(false);
+    }
+    if (
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email) &&
+      email !== '' &&
+      email !== ' ' &&
+      phoneNumber !== '' &&
+      phoneNumber !== ' ' &&
+      password !== '' &&
+      password !== ' ' &&
+      name !== ' ' &&
+      name !== '' &&
+      phoneNumber.length > 1
+    ) {
+      const body = JSON.stringify({
+        email: email,
+        password: password,
+        gender: 'male',
+        name: name,
+      });
+      setLoading(true);
+      axios({
+        method: 'POST',
+        url: `https://moosikk.herokuapp.com/api/v1/auth/register`,
+        data: body,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(async (response) => {
+          setLoading(false);
+          console.log(response.data);
+          await AsyncStorage.setItem('token', response.data.token);
+          navigation.navigate('Home');
+          // alert('Post has been favorited');
+        })
+        .catch(function (response) {
+          //handle error
+          // alert('User already exists');
+          // console.log(response);
+          setLoading(false);
+          // setErrors(true);
+          console.log(response);
+        });
+    }
   };
   return (
     <View style={styles.container}>
@@ -186,7 +210,7 @@ const Signup = ({
               style={styles.inputStyle}
             />
           </View>
-          {/* {nameErr && <Text style={styles.errTxt}>Full Name is required</Text>} */}
+          {nameErr && <Text style={styles.errTxt}>Full Name is required</Text>}
 
           <View style={styles.viewSearch}>
             <FontAwesome name="at" color="#bbb" size={20} />
@@ -347,21 +371,21 @@ const Signup = ({
               </Text>
             </TouchableOpacity>
           </View>
-          {/* {loading ? (
+          {loading ? (
             <ActivityIndicator
               size="large"
               color="#fff"
               style={{marginTop: loading ? 15 : 0}}
             />
-          ) : ( */}
-          <GlobalButton
-            navigationProps={signupHandler}
-            // onPress={onSubmit}
-            top={15}
-            btnWidth={'100%'}
-            buttonText="SIGNUP"
-          />
-          {/* )} */}
+          ) : (
+            <GlobalButton
+              navigationProps={signupHandler}
+              // onPress={onSubmit}
+              top={15}
+              btnWidth={'100%'}
+              buttonText="SIGNUP"
+            />
+          )}
 
           <Text style={styles.dontHave}>Already have an account?</Text>
           <TouchableOpacity

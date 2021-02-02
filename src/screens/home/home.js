@@ -26,16 +26,15 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {useTrackPlayerProgress} from 'react-native-track-player/lib/hooks';
 // import ErrorModal from '../../components/ErrorModal';
-const trackPlayerInit = async () => {
+const trackPlayerInit = async (url) => {
   await TrackPlayer.setupPlayer();
   await TrackPlayer.add({
     id: '1',
-    url: 'file:///home/vend/Videos/fyp/test.wav',
+    url: url,
     type: 'default',
     title: 'My Title',
     album: 'My Album',
-    artist: 'Rohan Bhatia',
-    artwork: 'https://picsum.photos/100',
+    artist: 'Ai Music',
   });
 
   return true;
@@ -49,15 +48,15 @@ const Home = ({navigation}) => {
   const {position, duration} = useTrackPlayerProgress(250);
   const [musicData, setMusicData] = useState([]);
 
-  useEffect(() => {
-    // if (isPlaying) {
-    const startPlayer = async () => {
-      let isInit = await trackPlayerInit();
-      setIsTrackPlayerInit(isInit);
-    };
-    startPlayer();
-    // }
-  }, []);
+  // useEffect(() => {
+  //   // if (isPlaying) {
+  //   const startPlayer = async () => {
+  //     let isInit = await trackPlayerInit();
+  //     setIsTrackPlayerInit(isInit);
+  //   };
+  //   startPlayer();
+  //   // }
+  // }, []);
   useEffect(() => {
     if (!isSeeking && position && duration) {
       setSliderValue(position / duration);
@@ -94,15 +93,21 @@ const Home = ({navigation}) => {
     });
     axios({
       method: 'POST',
-      url: `http://192.168.0.108:3000/api/v1/song/get-song-by-lyrics`,
+      url: `http://192.168.0.110:3000/api/v1/song/get-song-by-lyrics`,
       data: body,
       headers: {
         'Content-Type': 'application/json',
       },
     })
       .then(async (response) => {
-        // console.log(response.data);
+        console.log(response.data);
+        alert('Music has been generated. Please click on play');
         setLyrics('');
+        const startPlayer = async () => {
+          let isInit = await trackPlayerInit(response.data.url);
+          setIsTrackPlayerInit(isInit);
+        };
+        startPlayer();
         // alert('Post has been favorited');
       })
       .catch(function (response) {

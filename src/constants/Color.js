@@ -4,8 +4,8 @@ export default {
   purple: 'purple',
   pink: '#D16EF3',
   fontBlack: '#272727',
-  linearColor2: 'rgba(161, 89, 185, 0.88)', // #A159B9
-  linearColor1: 'rgba(110, 60, 143, 0.92)', // #6E3C8F
+  linearColor2: '#A159E9', // #A159B9 1aafd0
+  linearColor1: '#6E3CAF', // #6E3C8F 6a67ce
   bgLinear1: 'rgba(0,0,0,0.03)',
   bgLinear2: '#bbb',
   transparent: ' rgba(255,255,255, 0)',

@@ -26,16 +26,15 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {useTrackPlayerProgress} from 'react-native-track-player/lib/hooks';
 // import ErrorModal from '../../components/ErrorModal';
-const trackPlayerInit = async () => {
+const trackPlayerInit = async (url) => {
   await TrackPlayer.setupPlayer();
   await TrackPlayer.add({
     id: '1',
-    url: 'file:///home/vend/Videos/fyp/test.wav',
+    url: url,
     type: 'default',
     title: 'My Title',
     album: 'My Album',
-    artist: 'Rohan Bhatia',
-    artwork: 'https://picsum.photos/100',
+    artist: 'AI Generated Music',
   });
 
   return true;
@@ -48,16 +47,17 @@ const Home = ({navigation}) => {
   const [isSeeking, setIsSeeking] = useState(false);
   const {position, duration} = useTrackPlayerProgress(250);
   const [musicData, setMusicData] = useState([]);
+  const [songDuration, setSongDuration] = useState('0:00');
+  // useEffect(() => {
+  //   // if (isPlaying) {
+  //   const startPlayer = async () => {
+  //     let isInit = await trackPlayerInit();
+  //     setIsTrackPlayerInit(isInit);
+  //   };
+  //   startPlayer();
+  //   // }
+  // }, []);
 
-  useEffect(() => {
-    // if (isPlaying) {
-    const startPlayer = async () => {
-      let isInit = await trackPlayerInit();
-      setIsTrackPlayerInit(isInit);
-    };
-    startPlayer();
-    // }
-  }, []);
   useEffect(() => {
     if (!isSeeking && position && duration) {
       setSliderValue(position / duration);
@@ -94,15 +94,24 @@ const Home = ({navigation}) => {
     });
     axios({
       method: 'POST',
-      url: `http://192.168.0.108:3000/api/v1/song/get-song-by-lyrics`,
+      url: `http://192.168.18.49:3000/api/v1/song/get-song-by-lyrics`,
       data: body,
       headers: {
         'Content-Type': 'application/json',
       },
     })
       .then(async (response) => {
-        // console.log(response.data);
+        console.log(response.data);
+
+        const startPlayer = async () => {
+          let isInit = await trackPlayerInit(response.data.data);
+          setIsTrackPlayerInit(isInit);
+        };
+        startPlayer();
+
         setLyrics('');
+        setSongDuration(response.data.duration + '');
+
         // alert('Post has been favorited');
       })
       .catch(function (response) {
@@ -175,12 +184,12 @@ const Home = ({navigation}) => {
               size={20}
             />
             <Slider
-              style={{width: 400, height: 40}}
+              style={{width: '100%', height: 40, color: 'red'}}
               minimumValue={0}
               maximumValue={1}
               value={sliderValue}
-              minimumTrackTintColor="white"
-              maximumTrackTintColor="white"
+              minimumTrackTintColor="#A159E9"
+              maximumTrackTintColor="gray"
               onSlidingStart={slidingStarted}
               onSlidingComplete={slidingCompleted}
               thumbTintColor="white"
@@ -188,13 +197,15 @@ const Home = ({navigation}) => {
           </View>
           {/* )} */}
 
-          {/* <View style={styles.viewLine} />
+          <View style={styles.viewLine} />
           <Text style={styles.dontHave}>
-            By creating an account, you agree to our
+            {' '}
+            Song Duration is: {Math.round(songDuration)} seconds
           </Text>
-          <TouchableOpacity style={[styles.btnSignup, {marginBottom: 30}]}>
-            <Text style={styles.txtSignup}>Terms and conditions</Text>
-          </TouchableOpacity> */}
+
+          <Text style={styles.dontHave}>
+            Thank you for using our AI Model for Music Generation
+          </Text>
         </ScrollView>
       </LinearGradient>
     </View>
@@ -232,8 +243,10 @@ const styles = StyleSheet.create({
   },
   dontHave: {
     fontSize: 15,
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: 'rgba(255, 255, 255, 1)',
     alignSelf: 'center',
+    textAlign: 'center',
+    marginTop: 10,
   },
   inputStyle: {
     flex: 1,
@@ -290,13 +303,15 @@ const styles = StyleSheet.create({
     padding: 20,
     // flex: 0.45,
     marginTop: 40,
-    backgroundColor: '#7b5189',
-    // color: 'white',
+    backgroundColor: '#d0d2d3',
+    borderRadius: 50,
+    color: 'black',
     width: '100%',
   },
   fontAudio: {
     display: 'flex',
     flexDirection: 'column',
     textAlignVertical: 'center',
+    color: '#A159E9',
   },
 });

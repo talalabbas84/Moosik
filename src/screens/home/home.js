@@ -16,8 +16,6 @@ import axios from 'axios';
 
 import {Icon} from 'react-native-elements';
 
-// import Slider from '@react-native-community/slider';
-
 import {connect} from 'react-redux';
 import Color from '../../constants/Color';
 import LinearGradient from 'react-native-linear-gradient';
@@ -47,7 +45,8 @@ const Home = ({navigation}) => {
   const [isSeeking, setIsSeeking] = useState(false);
   const {position, duration} = useTrackPlayerProgress(250);
   const [musicData, setMusicData] = useState([]);
-  const [songDuration, setSongDuration] = useState('0:00');
+  const [songDuration, setSongDuration] = useState(0);
+  const [loading, setLoading] = useState(false);
   // useEffect(() => {
   //   // if (isPlaying) {
   //   const startPlayer = async () => {
@@ -78,11 +77,13 @@ const Home = ({navigation}) => {
     setIsSeeking(true);
   };
   const slidingCompleted = async (value) => {
-    await TrackPlayer.seekTo(value * duration);
+    await TrackPlayer.seekTo(0);
     setSliderValue(value);
     setIsSeeking(false);
   };
   const lyricsHandler = () => {
+    setLoading(true);
+
     const body = JSON.stringify({
       // user_id: await AsyncStorage.getItem('user_id'),
       // category_id: 6,
@@ -111,8 +112,7 @@ const Home = ({navigation}) => {
 
         setLyrics('');
         setSongDuration(response.data.duration + '');
-
-        // alert('Post has been favorited');
+        setLoading(false);
       })
       .catch(function (response) {
         //handle error
@@ -120,6 +120,7 @@ const Home = ({navigation}) => {
         console.log(response);
       });
   };
+
   return (
     <View style={styles.container}>
       {/* {error !== '' && (
@@ -154,27 +155,22 @@ const Home = ({navigation}) => {
             />
           </View>
 
-          {/* {emailErr && <Text style={styles.errTxt}>Invalid email</Text>} */}
-
-          {/* {passwordErr && <Text style={styles.errTxt}>Invalid Password</Text>} */}
-          {/* {errors ? (
-            <Text style={styles.errTxt}>Invalid email or password</Text>
-          ) : null} */}
-
-          {/* {loading ? (
+          {loading ? (
             <ActivityIndicator
               size="large"
               color="#fff"
-              // style={{marginVertical: loading ? 20 : 0}}
+              style={{marginVertical: loading ? 20 : 0}}
             />
-          ) : ( */}
-          <GlobalButton
-            // onPress={loginHandler}
-            navigationProps={lyricsHandler}
-            top={25}
-            btnWidth={'100%'}
-            buttonText="Generate Music"
-          />
+          ) : (
+            <GlobalButton
+              // onPress={loginHandler}
+              navigationProps={lyricsHandler}
+              top={25}
+              disabled={true}
+              btnWidth={'100%'}
+              buttonText="Generate Music"
+            />
+          )}
           <View style={styles.audioContainer}>
             <FontAwesome
               onPress={onButtonPressed}
@@ -198,10 +194,16 @@ const Home = ({navigation}) => {
           {/* )} */}
 
           <View style={styles.viewLine} />
-          <Text style={styles.dontHave}>
-            {' '}
-            Song Duration is: {Math.round(songDuration)} seconds
-          </Text>
+
+          {duration > 0 ? (
+            <Text style={styles.dontHave}>
+              Song Duration is: {Math.round(songDuration)} seconds
+            </Text>
+          ) : (
+            <Text style={styles.dontHave}>
+              Please Input English lyrics to generate Music
+            </Text>
+          )}
 
           <Text style={styles.dontHave}>
             Thank you for using our AI Model for Music Generation

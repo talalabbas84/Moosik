@@ -111,7 +111,7 @@ const Signup = ({
     } else {
       setnameErr(false);
     }
-    if (phoneNumber === '' || phoneNumber === ' ' || phoneNumber.length <= 1) {
+    if (phoneNumber === '' || phoneNumber === ' ' || phoneNumber.length <= 7) {
       setphoneNumberErr(true);
     } else {
       setphoneNumberErr(false);
@@ -131,7 +131,7 @@ const Signup = ({
       password !== ' ' &&
       name !== ' ' &&
       name !== '' &&
-      phoneNumber.length > 1
+      phoneNumber.length > 7
     ) {
       const body = JSON.stringify({
         email: email,
@@ -139,6 +139,8 @@ const Signup = ({
         gender: 'male',
         name: name,
       });
+
+      console.log(body);
       setLoading(true);
       axios({
         method: 'POST',
@@ -152,7 +154,7 @@ const Signup = ({
           setLoading(false);
           console.log(response.data);
           await AsyncStorage.setItem('token', response.data.token);
-          navigation.navigate('Home');
+          navigation.navigate('Login');
           // alert('Post has been favorited');
         })
         .catch(function (response) {

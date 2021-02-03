@@ -47,8 +47,6 @@ const Login = ({
       setpasswordErr(false);
     }
     if (email !== '' && password !== '') {
-      // login(email, password);
-      // login(email.trim().toLowerCase(), password, navigation);
       const body = JSON.stringify({
         email: email,
         password: password,
